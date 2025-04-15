@@ -1,0 +1,102 @@
+plugins {
+    id("io.micronaut.application") version "4.5.0"
+    id("com.gradleup.shadow") version "8.3.6"
+    id("io.micronaut.aot") version "4.5.0"
+}
+
+version = "0.1"
+group = "com.coom.ath"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut:micronaut-http-client-jdk")
+    implementation("io.micronaut.aws:micronaut-aws-lambda-events-serde")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    runtimeOnly("ch.qos.logback:logback-classic")
+
+    implementation('io.jsonwebtoken:jjwt:0.2')
+    implementation("io.micronaut.aws:micronaut-function-aws")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.aws:micronaut-function-aws-custom-runtime")
+    implementation(platform("io.micronaut:micronaut-bom:3.7.1"))
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    //aws
+    implementation group: 'software.amazon.awssdk', name: 'ssm', version: '2.12.0'
+    implementation group: 'software.amazon.awssdk', name: 'secretsmanager', version: '2.23.2'
+    implementation group: 'software.amazon.awssdk', name: 'dynamodb-enhanced', version: '2.29.26'
+    implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
+    implementation 'com.amazonaws:aws-lambda-java-events:3.11.0'
+    implementation("com.amazonaws:aws-java-sdk-dynamodb:1.12.389")
+
+    //MAP
+    implementation 'org.mapstruct:mapstruct:1.6.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
+
+    // Validaciones
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.0'
+    implementation group: 'jakarta.el', name: 'jakarta.el-api', version: '3.0.3'
+    implementation group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.1.Final'
+
+    //logs
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: '1.5.1'
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
+
+}
+
+
+application {
+    mainClass = "com.coom.ath.Application"
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+
+graalvmNative.toolchainDetection = false
+
+micronaut {
+    runtime("lambda_provided")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.coom.ath.*")
+    }
+    aot {
+        // Please review carefully the optimizations enabled below
+        // Check https://micronaut-projects.github.io/micronaut-aot/latest/guide/ for more details
+        optimizeServiceLoading = false
+        convertYamlToJava = false
+        precomputeOperations = true
+        cacheEnvironment = true
+        optimizeClassLoading = true
+        deduceEnvironment = true
+        optimizeNetty = true
+        replaceLogbackXml = true
+    }
+}
+
+
+tasks.named("dockerfileNative") {
+    jdkVersion = "17"
+    args(
+        "-XX:MaximumHeapSizePercent=80",
+        "-Dio.netty.allocator.numDirectArenas=0",
+        "-Dio.netty.noPreferDirect=true"
+    )
+}
+
+
