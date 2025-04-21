@@ -42,6 +42,8 @@ dependencies {
     //MAP
     implementation 'org.mapstruct:mapstruct:1.6.0'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
+    implementation 'com.amazonaws:aws-java-sdk-secretsmanager:1.12.385'
+    implementation('io.jsonwebtoken:jjwt:0.2')
 
     // Validaciones
     implementation("com.google.code.gson:gson:2.10.1")
@@ -54,6 +56,12 @@ dependencies {
     implementation group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: '1.5.1'
     implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5'
 
+    //AWS
+    implementation 'com.amazonaws:aws-java-sdk-ssm:1.12.429'
+    implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '3.11.0'
+
 }
 
 
@@ -61,8 +69,13 @@ application {
     mainClass = "com.coom.ath.Application"
 }
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    compileJava.options.encoding = 'UTF-8'
+    compileTestJava.options.encoding = 'UTF-8'
+//    sourceCompatibility = JavaVersion.toVersion("17")
+//    targetCompatibility = JavaVersion.toVersion("17")
 }
 
 

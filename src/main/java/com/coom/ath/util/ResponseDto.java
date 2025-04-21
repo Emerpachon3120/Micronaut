@@ -1,5 +1,7 @@
 package com.coom.ath.util;
 
+import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.SerdeImport;
 import lombok.Data;
 import java.util.List;
 
@@ -25,6 +27,8 @@ import java.util.List;
  * expresa de A Toda Hora S.A o de quién represente sus derechos.
  */
 @Data
+@Introspected
+@SerdeImport(ResponseDto.class)
 public class ResponseDto {
 
     private String statusCode;
