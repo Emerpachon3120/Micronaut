@@ -1,10 +1,11 @@
 package com.coom.ath.util;
 
-import com.amazonaws.services.secretsmanager.AWSSecretsManager;
-import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
-import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
-import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
+import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueResponse;
 
 /**
  * Clase para el manejo de tareas con Secrets Manager
@@ -27,6 +28,7 @@ import com.google.gson.JsonObject;
  * su uso, reproducción y copia de manera parcial o permanente salvo autorización
  * expresa de A Toda Hora S.A o de quién represente sus derechos.
  */
+@Slf4j
 public class SecretManagerUtil {
     /**
      * Constructor
@@ -44,32 +46,27 @@ public class SecretManagerUtil {
      * @return String JSON String del secreto
      */
     public static JsonObject getSecret(String secretName) {
+        SecretsManagerClient secretsManagerClient = SecretsManagerClient.create();
 
-        //Creacion del cliente para poder conectarse y recuperar los secretos
-        AWSSecretsManager secretsManager = AWSSecretsManagerClientBuilder.defaultClient();
+        GetSecretValueRequest getSecretValueRequest = GetSecretValueRequest.builder()
+                .secretId(secretName)  // Nombre del secreto
+                .build();
 
-        // Obtener el secreto
-        GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest()
-                .withSecretId(secretName);
-        //Obtener toda la informacion que contenga el secreto manager
-        GetSecretValueResult getSecretValueResult = secretsManager
-                .getSecretValue(getSecretValueRequest);
+        GetSecretValueResponse getSecretValueResponse = secretsManagerClient.getSecretValue(getSecretValueRequest);
+        String secretString = getSecretValueResponse.secretString();
 
-        return (JsonObject) Util.string2object(getSecretValueResult.getSecretString(),
-                JsonObject.class);
+        // Convertir el valor del secreto en un JsonObject
+        JsonObject secretJsonObject = JsonParser.parseString(secretString).getAsJsonObject();
+        return secretJsonObject;
 
     }
 
     /**
-     * Método que devuelve el valor de un secreto usando una clave que se le asigna asi como el JsonObject.
-     * Obtiene el valor de un secreto usando la clave enviada
+     * Método que devuelve el valor usando una variable que se le asigna asi como el JsonObject.
+     * Obtiene el valor usando la variable enviada
      * Este metodo recibe los parametros cuando se llama a la libreria
-     * @param secret Secreto de donde obtener el valor
-     * @param clave  Clave del valor a obtener
-     * @return String JSON String del secreto
+     * @return String JSON String del valor
      */
-
-    //Consultar la llave y retornar la informacion que tenga
     public static String getSecretValue(JsonObject secret, String clave) {
         if (secret.has(clave)) {
             return secret.get(clave).getAsString();

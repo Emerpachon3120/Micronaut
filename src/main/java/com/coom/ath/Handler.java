@@ -51,7 +51,7 @@ public class Handler extends MicronautRequestHandler<APIGatewayProxyRequestEvent
                 switch (servicio) {
                     case "guardar":
                         log.info("Entro a servicio guardar: ");
-                        Usuario usuarioGuardar = Util.string2object(input.getBody(), Usuario.class);
+                        Usuario usuarioGuardar = (Usuario) Util.string2object(input.getBody(), Usuario.class);
                         log.info("guardo: " + usuarioGuardar);
                         return dynamoService.saveUsuario(dynamoDbEnhancedClient, usuarioGuardar, parameterDto.getTabla());
                     case "consultar":

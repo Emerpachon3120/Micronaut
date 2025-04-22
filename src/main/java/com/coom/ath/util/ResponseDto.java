@@ -1,8 +1,13 @@
+/**
+ * DTO ResponseDto
+ */
+
 package com.coom.ath.util;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.SerdeImport;
 import lombok.Data;
+
 import java.util.List;
 
 /**

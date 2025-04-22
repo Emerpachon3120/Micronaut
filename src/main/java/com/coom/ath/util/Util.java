@@ -1,12 +1,16 @@
+/**
+ * Clase Util encargada de transformar objetos en string o string en objetos
+ */
 package com.coom.ath.util;
 
 import com.amazonaws.services.lambda.runtime.events.models.dynamodb.AttributeValue;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.serde.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,14 +43,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class Util {
     /**
-     * Instancia de Gson
-     */
-    private static Gson gson = new Gson();
-
-    /**
      * intancia de ObjectMapper para mapear objetos
      */
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper;
+
+    private static StringWriter errors = new StringWriter();
 
     /**
      * Transforma un string en un objeto según la clase
@@ -58,36 +59,21 @@ public class Util {
      * @param classOfT
      * @return
      */
-    public static <T> T string2object(String json, Class<T> classOfT) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
-            @Override
-            public JsonElement serialize(final Double src, final Type typeOfSrc, final JsonSerializationContext context) {
-                BigDecimal value = BigDecimal.valueOf(src);
-                return new JsonPrimitive(value);
-            }
-        });
-        Gson gson = gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-
-        return gson.fromJson(json, classOfT);
+    public static Object string2object(String json, Class<? extends Object> classOfT) {
+        Object objeto;
+        try {
+            objectMapper = ApplicationContext.run().getBean(ObjectMapper.class);
+            objeto = objectMapper.readValue(json, classOfT);
+        } catch (IOException e) {
+            e.printStackTrace(new PrintWriter(errors));
+            log.error(errors.toString());
+            throw new RuntimeException(e);
+        }
+        return objeto;
     }
 
-
-    public static Object string2objectWhitNulls(String json, Class<? extends Object> classOfT) {
-
-        GsonBuilder gsonBuilder = new GsonBuilder().serializeNulls();
-        gsonBuilder.registerTypeAdapter(Double.class, new JsonSerializer<Double>() {
-            @Override
-            public JsonElement serialize(final Double src, final Type typeOfSrc,
-                                         final JsonSerializationContext context) {
-                BigDecimal value = BigDecimal.valueOf(src);
-                return new JsonPrimitive(value);
-            }
-        });
-        gson = gsonBuilder.setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
-
-
-        return gson.fromJson(json, classOfT);
+    public static Object string2objectWhitNulls(String json, Class<? extends Object> classOfT){
+        return string2object(json, classOfT);
     }
 
 
@@ -99,9 +85,17 @@ public class Util {
      * @param typeObject
      * @return
      */
-    public static String object2String(Object typeObject) {
-        gson = new Gson().newBuilder().create();
-        return gson.toJson(typeObject);
+    public static String object2String(Object typeObject){
+        String json;
+        try {
+            objectMapper = ApplicationContext.run().getBean(ObjectMapper.class);
+            json = objectMapper.writeValueAsString(typeObject);
+        } catch (IOException e) {
+            e.printStackTrace(new PrintWriter(errors));
+            log.error(errors.toString());
+            throw new RuntimeException(e);
+        }
+        return json;
     }
 
     /**
@@ -123,9 +117,10 @@ public class Util {
      * @param typeObject
      * @return
      */
-    public static String object2StringWithNulls(Object typeObject) {
-        gson = new Gson().newBuilder().serializeNulls().create();
-        return gson.toJson(typeObject);
+    public static String object2StringWithNulls(Object typeObject){
+        /*gson = new Gson().newBuilder().serializeNulls().create();
+        return gson.toJson(typeObject);*/
+        return object2String(typeObject);
     }
 
     /**
@@ -135,7 +130,7 @@ public class Util {
      * @param image
      * @return un String con el Respectivo JSON transformado
      */
-    public static String convertToJson(Map<String, AttributeValue> image) throws JsonProcessingException {
+    public static String convertToJson(Map<String, AttributeValue> image) throws IOException {
         Util util = new Util();
         Map<String, Object> standardMap = new HashMap<>();
         for (Map.Entry<String, AttributeValue> entry : image.entrySet()) {

@@ -1,8 +1,13 @@
+
 package com.coom.ath.util;
 
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+
+
 import com.coom.ath.constants.MessagesEnum;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,28 +75,10 @@ public class BuildResponseUtil {
 
     /**
      * Mapea un DTO ResponseDto con respuesta de Error y lo guarda en un objeto APIGatewayProxyResponseEvent
-     * sin headers
-     * Este metodo recibe los parametros cuando se llama a la libreria
-     * @param ex
-     * @return
-     */
-    public static APIGatewayProxyResponseEvent buildError(Exception ex){
-        ResponseDto responseDto = new ResponseDto();
-        responseDto.setMessage(ex.getMessage());
-       // responseDto.setStatusCode(ex.getErrorCode());
-
-        return new APIGatewayProxyResponseEvent();
-               // .withBody(Util.object2String(responseDto))
-                //.withStatusCode(ex.getHttpCode()).withHeaders(headers);
-    }
-
-
-    /**
-     * Mapea un DTO ResponseDto con respuesta de Error y lo guarda en un objeto APIGatewayProxyResponseEvent
      * Este metodo recibe los parametros cuando se llama a la libreria
      * @return
      */
-    public static APIGatewayProxyResponseEvent buildErrorDefault() {
+    public static APIGatewayProxyResponseEvent buildErrorDefault() throws IOException {
 
         ResponseDto responseDto = new ResponseDto();
         responseDto.setMessage(MessagesEnum.DEFAULT_ERROR_RESPONSE.getMessage());
