@@ -42,10 +42,6 @@ public class ConsumiService {
         }
     }
 
-    public String mockRedebanResponse() {
-        // Aquí simulamos una respuesta como si viniera de Redeban
-        return "{ \"estado\": \"aprobado\", \"codigo\": \"200\", \"mensaje\": \"Operación exitosa\" }";
-    }
 
 
 }
