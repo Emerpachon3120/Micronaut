@@ -64,8 +64,7 @@ public class Handler extends MicronautRequestHandler<APIGatewayProxyRequestEvent
                         EnrollmentRq enrollmentRq = (EnrollmentRq) Util.string2object(input.getBody(), EnrollmentRq.class);
                         HeadersRq headersRq = (HeadersRq) Util.string2object(Util.object2String(input.getHeaders()), HeadersRq.class);
                         return consumiService.enrollmentKeyService(enrollmentRq, headersRq, parameterDto.getUrlDynamo());
-                    case "mock":
-                        return consumiService.mockRedebanResponse();
+
                     default:
                         return "Servicio no disponible";
                 }
