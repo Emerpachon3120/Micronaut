@@ -45,6 +45,7 @@ public class ParameterStoreUtil {
      */
     public static Map<String, String> getParameters(String path) {
 
+        // primero crea una conexion con el cliente AWSSimpleSystemsManagement
         SsmClient ssmClient = SsmClient.create();
 
         GetParametersByPathRequest getParametersByPathRequest = GetParametersByPathRequest.builder().

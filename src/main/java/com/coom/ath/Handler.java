@@ -1,18 +1,14 @@
 
 package com.coom.ath;
+
 import com.coom.ath.repository.DynamoMapperRepository;
 import com.coom.ath.util.BuildResponseUtil;
-
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.coom.ath.model.EnrollmentRq;
 import com.coom.ath.model.HeadersRq;
 import com.coom.ath.model.ParameterStoreDto;
 import com.coom.ath.model.Usuario;
-import com.coom.ath.repository.DynamoRepository;
 import com.coom.ath.repository.ParameterStoreRepository;
 import com.coom.ath.service.ConsumiService;
 import com.coom.ath.service.DynamoService;
@@ -26,10 +22,10 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 @Introspected
 public class Handler extends MicronautRequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
+    //Crea un objeto que retorna ParameterRepository que retorna un ParameterStoreDto
     ParameterStoreRepository parameterRepository = new ParameterStoreRepository();
+    //Crea un objeto parameterStoreDto, al cual se le asigna el parameter Repository
     ParameterStoreDto parameterDto = parameterRepository.getParameter();
-    DynamoRepository dynamoRepository = new DynamoRepository();
-    //DynamoDBMapper dynamoDBMapper = dynamoRepository.build(parameterDto);
     DynamoService dynamoService = new DynamoService();
     ConsumiService consumiService = new ConsumiService();
     DynamoMapperRepository dynamoMapperRepository = new DynamoMapperRepository(parameterDto.getRegion());
@@ -44,15 +40,22 @@ public class Handler extends MicronautRequestHandler<APIGatewayProxyRequestEvent
     // Validación y llamada a los diferentes tipos de servicios
     public Object redirect(APIGatewayProxyRequestEvent input) {
         try {
+            //Mira que el body no se encuentre vacio
             if (input.getBody() != null) {
+                //Recupera el headers que envio desde postan
                 String servicio = input.getHeaders().get("servicio");
+                //Muestra en consola el Header
                 log.info("Tiene servicio: " + servicio);
-
+                //Dependiendo del servicio entra al case
                 switch (servicio) {
                     case "guardar":
+                        //Entra al servicio de guardar
                         log.info("Entro a servicio guardar: ");
+                        //Crea una instancia de Usuario y le asigna el objeto PArceandolo a usuario
                         Usuario usuarioGuardar = (Usuario) Util.string2object(input.getBody(), Usuario.class);
+                        //Muestra el objeto que guardo en la bd
                         log.info("guardo: " + usuarioGuardar);
+
                         return dynamoService.saveUsuario(dynamoDbEnhancedClient, usuarioGuardar, parameterDto.getTabla());
                     case "consultar":
                         Usuario usuarioConsultar = (Usuario) Util.string2object(input.getBody(), Usuario.class);

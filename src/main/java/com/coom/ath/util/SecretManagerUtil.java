@@ -38,7 +38,7 @@ public class SecretManagerUtil {
 
     /**
      * Método que devuelve un JSON String con los valores de los secretos
-     * Creando una conexion con AWSSecretManager, hace la consulta de secretos segun el nombre del secreto
+     * Creando una conexion con AWSSe cretManager, hace la consulta de secretos segun el nombre del secreto
      * devuelve un JsonObject con los valores obtenidos
      * Este metodo recibe los parametros cuando se llama a la libreria
      *

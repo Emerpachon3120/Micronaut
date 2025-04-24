@@ -33,8 +33,6 @@ import static com.coom.ath.constants.HeadersEnum.*;
 @Slf4j
 public class HeaderUtil {
 
-
-
     public void addEnrollmentHeaders(HttpPost httpPost,
                                      HeadersRq headers) {
 

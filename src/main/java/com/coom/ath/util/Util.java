@@ -59,6 +59,8 @@ public class Util {
      * @param classOfT
      * @return
      */
+
+    //Metodo para convertir un JSOn en objeto de JAVA del tipo clase que se le indique
     public static Object string2object(String json, Class<? extends Object> classOfT) {
         Object objeto;
         try {
